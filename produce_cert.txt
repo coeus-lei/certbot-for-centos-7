@@ -25,6 +25,7 @@ install_api() {
 	echo -e "dns_cloudflare_email = $EMAIl\ndns_cloudflare_api_key = $API" >/root/.secrets/certbot/cloudflare.ini
 	chmod 0400 ~/.secrets/certbot/cloudflare.ini
 }
+echo -e "\n0 0,12 * * * " python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew" > /var/spool/cron/root
 
 install_certbot
 install_pip
