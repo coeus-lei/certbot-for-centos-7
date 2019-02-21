@@ -1,7 +1,8 @@
 #!/bin/bash
 production_cert() {
         certbot certonly -d $DOMAIN \
-        --agree-tos --email jintai_devops@163.com \
+        --agree-tos 
+        --email YOUR_ENAIL \
         --server https://acme-v02.api.letsencrypt.org/directory \
         --dns-cloudflare \
         --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
