@@ -1,0 +1,32 @@
+#!/bin/bash
+#install certbot
+install_certbot() {
+    if [ 7 -eq `awk -F"[. ]" '{print $4}' /etc/redhat-release` ]; then
+	echo "it's for centos 7 to install certbot";fi
+	yum -y install epel-release && yum -y install python-pip && pip install --upgrade pip
+	pip install certbot-dns-cloudflare && mkdir -p /root/.secrets/certbot && chmod 0700 /root/.secrets/
+	bash new3
+}
+
+install_pip() {
+    yum -y install python-pip && pip install --upgrade pip
+	if [[ "19.0.2" == "$(pip --version | awk '{print $2}')" ]] && [[ "2.7" == "$(pip --version | awk -F"[ )]?" '{print $6}')" ]];then
+    pip install certbot-dns-cloudflare && pip install --upgrade setuptools --user python;fi
+}
+certfile() {
+    mypath="/root/.secrets/certbot"
+	if [ ! -d "$mypath" ];then
+	mkdir -p "$mypath" && chmod 0700 ~/.secrets ;else
+	echo "$mypath is already exist";fi
+}
+install_api() {
+    EMAIl="jintai_devops@163.com"
+	API=e98f2b10638ca8dabb4c9f9fb78dee8032cce
+	echo -e "dns_cloudflare_email = $EMAIl\ndns_cloudflare_api_key = $API" >/root/.secrets/certbot/cloudflare.ini
+	chmod 0400 ~/.secrets/certbot/cloudflare.ini
+}
+
+install_certbot
+install_pip
+certfile
+install_api

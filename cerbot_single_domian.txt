@@ -1,0 +1,46 @@
+#!/bin/bash
+#produce cert for your DOMAIN
+WORK_DIR=/etc/letsencrypt/archive
+MY_BAK=/root/tar/bak
+MY_SSL=/root/tar/ssl
+
+if [ ! -d "$MY_BAK" ] && [ ! -d "$MY_SSL" ];then
+    mkdir -p "$MY_BAK" 
+	mkdir -p "$MY_SSL"
+fi
+
+read -p "please input your DOMAIN: " DOMAIN
+if [ ! -d "$WORK_DIR/$DOMAIN" ];then
+   source ~/myfuns
+   production_cert
+   cd $WORK_DIR/$DOMAIN
+   find .  \( \! -name "cert*" \) \( \! -name "." \) | awk -F"/" '{print $2}' | xargs tar -czf $DOMAIN.tar.gz
+   mkdir -p $MY_SSL/$DOMAIN
+   mv $DOMAIN.tar.gz $MY_BAK
+   
+else
+       cd $WORK_DIR/$DOMAIN
+            NUM=`ls | wc -l`
+       if [ "4" == "$NUM" ];then
+            echo -e "\e[1;42m this is the second time to use certbot,please input 2! \e[0m"
+       elif [ "8" == "$NUM" ];then
+            echo -e "\e[1;42m this is  the third time to use certbot,please input 2! \e[0m"
+       elif [ "12" == "$NUM" ];then
+            echo -e "\e[1;42m this is  the forth time to use certbot,please input 2! \e[0m"
+       elif [ "16" == "$NUM" ];then
+            echo -e "\e[1;42m This is the last time to using certbot this week!please input 2! \e[0m"
+       elif [ "20" == "$NUM" ];then
+            find . -type f -print | grep "5" | awk -F"[/]" '{print $2}' | xargs tar -zcf $DOMAIN.tar.gz
+            mv $DOMAIN.tar.gz $MY_BAK
+       else
+            echo "There is a error in your $WORK_DIR/$DOMAIN,you should check it!"
+       fi
+	   
+   source ~/myfuns
+   production_cert
+       if [ -d "$MY_SSL/$DOMAIN" ];then
+	   mkdir -p $MY_SSL/$DOMAIN && cd $WORK_DIR/$DOMAIN
+       ls -lt *.pem | head -4 | awk '{print $9}' | xargs -i cp {} /root/tar/ssl/$DOMAIN/
+#   ls -lt *.pem | head -4 | awk '{print $9}' | xargs -i cp {} /root/tar/ssl/22750.vip/
+       fi
+fi
