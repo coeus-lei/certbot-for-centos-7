@@ -1,25 +1,21 @@
 #!/bin/bash
 #produce cert for your DOMAIN
-WORK_DIR=/etc/letsencrypt/archive
+path='etc/letsencrypt/archive'
 MY_BAK=/root/tar/bak
-MY_SSL=/root/tar/ssl
+ssl_path='root/tar/ssl'
 
-if [ ! -d "$MY_BAK" ] && [ ! -d "$MY_SSL" ];then
+if [ ! -d "$MY_BAK" ] && [ ! -d "$ssl_path" ];then
     mkdir -p "$MY_BAK" 
-	mkdir -p "$MY_SSL"
+	mkdir -p "$ssl_path"
 fi
 
 read -p "please input your DOMAIN: " DOMAIN
-if [ ! -d "$WORK_DIR/$DOMAIN" ];then
+if [ ! -d "/$path/$DOMAIN" ];then
    source ~/myfuns
    production_cert
-   cd $WORK_DIR/$DOMAIN
-   find .  \( \! -name "cert*" \) \( \! -name "." \) | awk -F"/" '{print $2}' | xargs tar -czf $DOMAIN.tar.gz
-   mkdir -p $MY_SSL/$DOMAIN
-   mv $DOMAIN.tar.gz $MY_BAK
    
 else
-       cd $WORK_DIR/$DOMAIN
+       cd /$path/$DOMAIN
             NUM=`ls | wc -l`
        if [ "4" == "$NUM" ];then
             echo -e "\e[1;42m this is the second time to use certbot,please input 2! \e[0m"
@@ -33,14 +29,30 @@ else
             find . -type f -print | grep "5" | awk -F"[/]" '{print $2}' | xargs tar -zcf $DOMAIN.tar.gz
             mv $DOMAIN.tar.gz $MY_BAK
        else
-            echo "There is a error in your $WORK_DIR/$DOMAIN,you should check it!"
+            echo -e "\e[1;42m There is a error in your /$path/$DOMAIN,you should check it! \e[0m"
        fi
 	   
    source ~/myfuns
    production_cert
-       if [ -d "$MY_SSL/$DOMAIN" ];then
-	   mkdir -p $MY_SSL/$DOMAIN && cd $WORK_DIR/$DOMAIN
-       ls -lt *.pem | head -4 | awk '{print $9}' | xargs -i cp {} /root/tar/ssl/$DOMAIN/
-#   ls -lt *.pem | head -4 | awk '{print $9}' | xargs -i cp {} /root/tar/ssl/22750.vip/
+   
+   a=(`ls /$path/$DOMAIN/ |egrep "cert.*.pem"|tr -d "cert .pm"`)
+   num=${a[0]}
+for n in ${!a[@]};do
+       if [[ $num -le ${a[$n]} ]];then
+            num=${a[$n]}
+       fi
+done
+
+       if [[ -f /$path/$DOMAIN/cert${num}.pem ]] && [[ -f /$path/$DOMAIN/chain${num}.pem ]]\
+           && [[ -f /$path/$DOMAIN/fullchain${num}.pem ]] && [[ -f /$path/$DOMAIN/privkey${num}.pem ]];then
+           mkdir /$ssl_path/$DOMAIN -p
+           mv /$ssl_path/$DOMAIN/* /tmp/ >/dev/null 2>&1
+           cd /$path/$DOMAIN/
+           \cp cert${num}.pem /$ssl_path/$DOMAIN/cert.pem
+           \cp chain${num}.pem /$ssl_path/$DOMAIN/chain.pem
+           \cp fullchain${num}.pem  /$ssl_path/$DOMAIN/fullchain.pem
+           \cp privkey${num}.pem /$ssl_path/$DOMAIN/privkey.pem
+       else
+           echo '文件数据异常,请核对'
        fi
 fi
