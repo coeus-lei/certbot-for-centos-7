@@ -20,8 +20,8 @@ certfile() {
 	echo "$mypath is already exist";fi
 }
 install_api() {
-    EMAIl="jintai_devops@163.com"
-	API=e98f2b10638ca8dabb4c9f9fb78dee8032cce
+        EMAIl="YOUR_DOMAIN"
+	API="YOUR_DNS_API"
 	echo -e "dns_cloudflare_email = $EMAIl\ndns_cloudflare_api_key = $API" >/root/.secrets/certbot/cloudflare.ini
 	chmod 0400 ~/.secrets/certbot/cloudflare.ini
 }
