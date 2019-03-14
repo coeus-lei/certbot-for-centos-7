@@ -21,5 +21,5 @@ then
 	then
 		mkdir /root/rsynccert/$1
 	fi
-	~/.acme.sh/acme.sh --installcert -d $1 --key-file /root/rsynccert/$1/$1.key --fullchain-file /root/rsynccert/$1/$1.cer
+	~/.acme.sh/acme.sh --installcert -d $1 --key-file /root/rsynccert/$1/$1.key --fullchain-file /root/rsynccert/$1/fullchain.cer
 fi
